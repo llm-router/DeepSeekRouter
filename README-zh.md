@@ -1,7 +1,7 @@
 # DeepSeek API Router
 
 <p align="center">
-   <a href="https://github.com/llm-router/DeepSeekRouter/blob/main/README.md">English</a> <a href="https://github.com/deepseek-router/DeepSeekRouter/blob/main/README-zh.md">中文</a>
+   <a href="https://github.com/llm-router/DeepSeekRouter/blob/main/README.md">English</a> <a href="https://github.com/llm-router/DeepSeekRouter/blob/main/README-zh.md">中文</a>
 </p>
 
 本仓库是一个开源的DeepSeek API Router，支持自定义策略(例如最低价格、最高每秒输出token数)来选择合适的API。
@@ -25,7 +25,7 @@
 ```bash
 conda create -n deepseek_router python=3.10
 conda activate deepseek_router
-git clone --recurse-submodules git@github.com:deepseek-router/DeepSeekRouter.git
+git clone --recurse-submodules git@github.com:llm-router/DeepSeekRouter.git
 cd DeepSeekRouter
 pip install -e .
 ```

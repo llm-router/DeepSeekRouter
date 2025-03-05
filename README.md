@@ -1,7 +1,7 @@
 # An Open-Source DeepSeek API Router
 
 <p align="center">
-   <a href="https://github.com/llm-router/DeepSeekRouter/blob/main/README.md">English</a> <a href="https://github.com/deepseek-router/DeepSeekRouter/blob/main/README-zh.md">中文</a>
+   <a href="https://github.com/llm-router/DeepSeekRouter/blob/main/README.md">English</a> <a href="https://github.com/llm-router/DeepSeekRouter/blob/main/README-zh.md">中文</a>
 </p>
 
 An open-source router for public DeepSeek API services with custom policies (e.g., lowest price, highest output token rate).
@@ -25,7 +25,7 @@ Currently, it supports DeepSeek R1 and the following providers:
 ```bash
 conda create -n deepseek_router python=3.10
 conda activate deepseek_router
-git clone --recurse-submodules git@github.com:deepseek-router/DeepSeekRouter.git
+git clone --recurse-submodules git@github.com:llm-router/DeepSeekRouter.git
 cd DeepSeekRouter
 pip install -e .
 ```
