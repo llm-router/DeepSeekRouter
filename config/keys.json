@@ -1,0 +1,47 @@
+{
+  "volcengine": {
+    "default": ""
+  },
+  "together": {
+    "default": ""
+  },
+  "nvidia": {
+    "default": ""
+  },
+  "deepseek": {
+    "default": ""
+  },
+  "azure": {
+    "default": ""
+  },
+  "fireworks": {
+    "default": ""
+  },
+  "aliyun": {
+    "default": ""
+  },
+  "tencent": {
+    "default": ""
+  },
+  "huawei": {
+    "default": ""
+  },
+  "siliconflow": {
+    "default": ""
+  },
+  "siliconflow-pro": {
+    "default": ""
+  },
+  "chinamobile": {
+    "default": ""
+  },
+  "chinamobile-64k": {
+    "default": ""
+  },
+  "chinatelecom": {
+    "default": ""
+  },
+  "chinatelecom-ascend": {
+    "default": ""
+  }
+}

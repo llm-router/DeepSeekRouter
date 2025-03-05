@@ -1,0 +1,14 @@
+{
+  "USD": {
+    "base": 1000,
+    "conversion": {
+      "CNY": 7300
+    }
+  },
+  "CNY": {
+    "base": 1000,
+    "conversion": {
+      "USD": 137
+    }
+  }
+}

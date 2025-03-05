@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LLM QoS Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+    <style>
+        .container {
+            width: 95%;
+            margin: 20px auto;
+        }
+
+        .filters {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 8px 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f5f5f5;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .plot-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="filters">
+            <select id="model-select">
+                <option value="">Loading models...</option>
+            </select>
+
+            <select id="currency-select">
+                <option value="CNY" selected>CNY</option>
+                <option value="USD">USD</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Provider</th>
+                        <th onclick="sortTable(1)">Price/1M input tokens</th>
+                        <th onclick="sortTable(2)">Price/1M output tokens</th>
+                        <th onclick="sortTable(3)">GPQA-Diamond</th>
+                        <th onclick="sortTable(4)">AIME2024</th>
+                        <th onclick="sortTable(5)">Success rate</th>
+                        <th onclick="sortTable(6)">Output length</th>
+                        <th onclick="sortTable(7)">Output tokens/s</th>
+                        <th onclick="sortTable(8)">Time to first token</th>
+                        <th onclick="sortTable(9)">Prefill rate</th>
+                        <th onclick="sortTable(10)">Decode rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="11">Loading data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="plots">
+            <!--            <div class="plot-container" id="bar-chart"></div>-->
+            <div class="plot-container" id="line-chart1"></div>
+            <div class="plot-container" id="line-chart2"></div>
+            <div class="plot-container" id="box-plot"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSortColumn = -1;
+        let ascendingOrder = true;
+        let providers = [];
+        let dynamicColumns = {
+            4: 'gpqa',
+            5: 'aime2024',
+            6: 'success',
+            7: 'otpr',
+            8: 'otps',
+            9: 'ttft',
+            10: 'prefill',
+            11: 'decode'
+        };
+
+        function formatToTwoDecimalPlaces(value) {
+            if (value !== null && value !== undefined) {
+                return value.toFixed(2);
+            }
+            return value;
+}
+
+        async function loadModels() {
+            try {
+                const response = await fetch('/api/list_models');
+                const data = await response.json();
+                const modelSelect = document.getElementById('model-select');
+
+                modelSelect.innerHTML = ""; // Clear existing options
+
+                if (data.status) {
+                    const models = data.models;
+                    models.forEach((model, index) => {
+                        const option = document.createElement('option');
+                        option.value = model.model_code;
+                        option.textContent = model.model_name;
+                        if (index === 0) {
+                            option.selected = true; // Set first result as default
+                        }
+                        modelSelect.appendChild(option);
+                    });
+                    fetchTableData();
+                } else {
+                    console.error("Error loading models: ", data.error);
+                    document.getElementById('model-select').innerHTML = '<option value="">Failed to load models</option>';
+                }
+            } catch (error) {
+                console.error("Error loading models:", error);
+                document.getElementById('model-select').innerHTML = '<option value="">Failed to load models</option>';
+            }
+        }
+
+        async function fetchTableData() {
+            const model = document.getElementById('model-select').value;
+            const currency = document.getElementById('currency-select').value;
+            if (!model) return;
+
+            try {
+                const response = await fetch(`/api/list_providers?model=${model}&currency=${currency}`);
+                const data = await response.json();
+                if (data.status) {
+                    providers = data.providers
+                    populateTable();
+                    loadDynamicCells();
+                    loadLines();
+                    loadBoxes();
+                } else {
+                    console.error("Error fetching table data:", data.error);
+                    document.querySelector("#data-table tbody").innerHTML = `<tr><td colspan="11">Failed to load data</td></tr>`;
+                }
+            } catch (error) {
+                console.error("Error fetching table data:", error);
+                document.querySelector("#data-table tbody").innerHTML = `<tr><td colspan="11">Failed to load data</td></tr>`;
+            }
+        }
+
+        function populateTable() {
+            const tbody = document.querySelector("#data-table tbody");
+            tbody.innerHTML = "";
+
+            if (providers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11">No data available</td></tr>`;
+                return;
+            }
+
+            providers.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.setAttribute('provider', row.provider_code);
+                const nameCell = document.createElement("td");
+                const nameLink = document.createElement("a");
+                nameLink.href = `${row.provider_homepage}`;
+                nameLink.target = '_blank';
+                nameLink.textContent = row.provider_name;
+                nameCell.appendChild(nameLink);
+                tr.appendChild(nameCell);
+                const rowData = [
+                    formatToTwoDecimalPlaces(row.price_per_million_input_tokens) || "N/A",
+                    formatToTwoDecimalPlaces(row.price_per_million_output_tokens) || "N/A",
+                ];
+
+                rowData.forEach(cell => {
+                    const td = document.createElement("td");
+                    td.textContent = cell;
+                    tr.appendChild(td);
+                });
+
+                for (let i = 0; i < Object.keys(dynamicColumns).length; i++) {
+                    const dynamicCell = document.createElement("td");
+                    dynamicCell.innerHTML = '<div class="loading-spinner"></div>';
+                    tr.appendChild(dynamicCell);
+                }
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function loadDynamicCell(cell, provider, metric, startTime, endTime, interval, stat) {
+            const model = document.getElementById('model-select').value;
+            try {
+                const response = await fetch(`/api/query_metric?model=${model}&provider=${provider}&metric=${metric}&start_time=${encodeURIComponent(startTime)}&end_time=${encodeURIComponent(endTime)}&interval=${interval}&stat=${stat}`);
+                const data = await response.json();
+
+                if (data.status) {
+                    if (metric === 'success') {
+                        const rate = data.datapoints[0].values[0] * 100;
+                        cell.textContent = `${rate.toFixed(2)}%`;
+                    } else {
+                        const value = data.datapoints[0].values[0];
+                        cell.textContent = `${value.toFixed(2)}`;
+                    }
+                } else {
+                    cell.textContent = 'N/A';
+                }
+            } catch (error) {
+                console.error('Error loading metric:', error);
+                cell.textContent = 'N/A';
+            }
+        }
+
+        function loadDynamicCellsForColumn(colIdx, metric, startTime, endTime, interval, stat) {
+            const rows = document.querySelectorAll('#data-table tbody tr');
+            for (const row of rows) {
+                const providerCode = row.getAttribute('provider');
+                const cell = row.querySelector(`td:nth-child(${colIdx})`);
+                loadDynamicCell(cell, providerCode, metric, startTime, endTime, interval, stat);
+            }
+        }
+
+        function loadDynamicCells() {
+            const now = new Date();
+            const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const interval = 7 * 24 * 60;
+            const stat = 'avg';
+            const nowStr = toRFC3339WithTimeZone(now);
+            const dayAgoStr = toRFC3339WithTimeZone(dayAgo);
+
+            Object.entries(dynamicColumns).forEach(([colIdx, metric]) => {
+                loadDynamicCellsForColumn(colIdx, metric, dayAgoStr, nowStr, interval, stat);
+            });
+        }
+
+        function sortTable(columnIndex) {
+            const table = document.getElementById("data-table");
+            const tbody = table.querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+
+            // Determine sorting order
+            if (currentSortColumn === columnIndex) {
+                ascendingOrder = !ascendingOrder;
+            } else {
+                ascendingOrder = true;
+                currentSortColumn = columnIndex;
+            }
+
+            rows.sort((a, b) => {
+                const valA = a.children[columnIndex].innerText;
+                const valB = b.children[columnIndex].innerText;
+
+                // Detect numbers for correct sorting
+                const numA = parseFloat(valA);
+                const numB = parseFloat(valB);
+
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    return ascendingOrder ? numA - numB : numB - numA;
+                }
+
+                return ascendingOrder ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            });
+
+            // Re-append sorted rows
+            tbody.innerHTML = "";
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        async function plotLineChartForAllProviders(model, metric, startTime, endTime, interval, stat, chartName, chartMetadata) {
+            let urls = [];
+            providers.forEach(provider => {
+                urls.push(`/api/query_metric?model=${model}&provider=${provider.provider_code}&metric=${metric}&start_time=${encodeURIComponent(startTime)}&end_time=${encodeURIComponent(endTime)}&interval=${interval}&stat=${stat}`)
+            });
+            let lineChartData = [];
+            try {
+                const promises = urls.map(url => fetch(url));
+                const results = await Promise.all(promises);
+                const data = await Promise.all(results.map(result => result.json()));
+                for (let i = 0; i < providers.length; i++) {
+                    if (data[i].status) {
+                        const datapoints = data[i].datapoints;
+                        let line = {
+                            type: "scatter",
+                            name: providers[i].provider_name,
+                            x: [],
+                            y: []
+                        };
+                        datapoints.forEach(datapoint => {
+                            line.x.push(datapoint.start_time);
+                            if (datapoint.values.length > 0) {
+                                line.y.push(datapoint.values[0]);
+                            } else {
+                                line.y.push(0);
+                            }
+                        });
+                        lineChartData.push(line);
+                    }
+                }
+                Plotly.newPlot(chartName, lineChartData, chartMetadata);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function loadLines() {
+            // Bar Chart
+            // Plotly.newPlot('bar-chart', [{
+            //     x: sampleData.bar.x,
+            //     y: sampleData.bar.y,
+            //     type: 'bar'
+            // }], {
+            //     title: 'Performance Metrics'
+            // });
+
+            const now = new Date();
+            const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const interval = 60;
+            const stat = 'avg';
+            const nowStr = toRFC3339WithTimeZone(now);
+            const dayAgoStr = toRFC3339WithTimeZone(dayAgo);
+            const model = document.getElementById('model-select').value;
+
+            plotLineChartForAllProviders(model, 'success', dayAgoStr, nowStr, interval, stat, 'line-chart1',
+                { title: 'Success rate', yaxis: { tickformat: ',.0%', range: [0, 1] } }
+            );
+            plotLineChartForAllProviders(model, 'otps', dayAgoStr, nowStr, interval, stat, 'line-chart2',
+                { title: 'Output tokens per second' }
+            );
+        }
+
+        async function loadBoxes() {
+            const now = new Date();
+            const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const interval = 7 * 24 * 60;
+            const stat = 'raw';
+            const nowStr = toRFC3339WithTimeZone(now);
+            const dayAgoStr = toRFC3339WithTimeZone(dayAgo);
+            const metric = 'otps';
+            const model = document.getElementById('model-select').value;
+
+            let urls = [];
+            providers.forEach(provider => {
+                urls.push(`/api/query_metric?model=${model}&provider=${provider.provider_code}&metric=${metric}&start_time=${encodeURIComponent(dayAgoStr)}&end_time=${encodeURIComponent(nowStr)}&interval=${interval}&stat=${stat}`)
+            });
+            let boxPlotData = [];
+            try {
+                const promises = urls.map(url => fetch(url));
+                const results = await Promise.all(promises);
+                const data = await Promise.all(results.map(result => result.json()));
+                for (let i = 0; i < providers.length; i++) {
+                    if (data[i].status) {
+                        const datapoints = data[i].datapoints;
+                        boxPlotData.push({
+                            type: "box",
+                            y: datapoints[0].values,
+                            name: providers[i].provider_name
+                        });
+                    }
+                }
+                Plotly.newPlot('box-plot', boxPlotData, {
+                    title: 'Variability of output tokens per second'
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function toRFC3339WithTimeZone(date) {
+            // Get the ISO string format but remove the 'Z'
+            // TODO: hack, must fix
+            const newDate = new Date(date.getTime() + 8 * 60 * 60 * 1000)
+            const isoString = newDate.toISOString().slice(0, -1);
+            return `${isoString}+00:00`
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadModels();
+        });
+        document.getElementById('model-select').addEventListener('change', fetchTableData);
+        document.getElementById('currency-select').addEventListener('change', fetchTableData);
+    </script>
+</body>
+
+</html>

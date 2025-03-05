@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "DeepSeek Router"
+version = "0.1.0"
+description = "An Open-Source DeepSeek API Router"
+readme = "README.md"
+license = "Apache 2.0"
+
+[tool.poetry.dependencies]
+python = "~3.10.1"
+openai = "^1.63.2"
+jinja2 = "^3.1.5"
+transformers = "^4.36.0"
+datasets = "^3.3.2"
+azure-ai-inference = "^1.0.0b9"
+azure-identity= "^1.20.0"
+mysql-connector-python= "^9.2.0" # Replace with psycopg2 if you use PostgreSQL
+SQLAlchemy=	"^2.0.38"
+opencompass= {"path" = "./opencompass", "develop" = true}
+flask="^3.1.0"
+pyext = "0.6"
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"

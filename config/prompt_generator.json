@@ -1,0 +1,14 @@
+{
+  "model": {
+    "base_url": "http://localhost:1234/v1",
+    "model": "DeepSeek-R1-Distill-Qwen-14B-GGUF/DeepSeek-R1-Distill-Qwen-14B-Q4_K_M.gguf",
+    "reasoning_inline": true,
+    "reasoning_start": "<think>",
+    "reasoning_end": "</think>",
+    "api_key": "lm-studio",
+    "note": "This is only for LLM-generated testing prompts. You can safely ignore it."
+  },
+  "datasets": {
+    "directory": "../../datasets"
+  }
+}

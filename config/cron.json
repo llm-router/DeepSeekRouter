@@ -1,0 +1,7 @@
+{
+  "perf_models": [
+    "deepseek-r1"
+  ],
+  "max_workers_per_job": 32,
+  "log_dir": "<ABSOLUTE_PATH_TO_WHERE_YOU_WANT_TO_LOG_THE_DATA>"
+}

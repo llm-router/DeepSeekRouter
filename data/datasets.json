@@ -1,0 +1,22 @@
+{
+    "gpqa": {
+        "path": "gpqa.gpqa_gen",
+        "name": "gpqa_datasets"
+    },
+    "mmlu": {
+        "path": "mmlu.mmlu_gen",
+        "name": "mmlu_datasets"
+    },
+    "aime2024": {
+        "path": "aime2024.aime2024_gen",
+        "name": "aime2024_datasets"
+    },
+    "livecodebench": {
+        "path": "livecodebench.livecodebench_gen",
+        "name": "LCB_datasets"
+    },
+    "ceval": {
+        "path": "ceval.ceval_gen",
+        "name": "ceval_datasets"
+    }
+}
