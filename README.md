@@ -20,6 +20,24 @@ Currently, it supports DeepSeek R1 and the following providers:
 - [China Mobile Cloud](https://ecloud.10086.cn/portal)
 - [State Cloud](https://www.ctyun.cn/act/xirang/deepseek)
 
+The following table explains the metrics that this tool can evaluate:
+
+| **Abbreviation**         | **Full Form**                                      | **Description**                                                                       | **Supported Statistics**   | 
+|---------------------|----------------------------------------------------|---------------------------------------------------------------------------------------|----------------------------|
+| **ttft**            | Time to first token                                | Latency between input submission and generation of the first output token             | average, median, p90, p99  |
+| **prefill**         | Prefill tokens per second                          | # of input tokens / ttft                                                              | average, median, p90, p99  |
+| **decode**          | Decode tokens per second                           | # of output tokens / (total time - ttft)                                              | average, median, p90, p99  |
+| **OTPS**            | Output tokens per second                           | # of output tokens / total time                                                       | average, median, p90, p99  |
+| **OTPR**            | Output tokens per request                          | Total output tokens (including reasonong tokens) generated to answer one user request | average, median, p90, p99  |
+| **Success Rate**    | Request success rate                               | Percentage of requests completed without errors/timeouts (regardless of correctness)  | |
+| **GPQA**            | Graduate-Level Google-Proof Q&A                    | Benchmark testing **expert-level knowledge** across STEM/humanities                   | |
+| **AIME2024**        | American Invitational Mathematics Examination 2024 | **Math problem-solving** benchmark based on real competition questions                | |
+| **LiveCodeBench**   | Live Coding Benchmark                              | **Code generation** evaluation with execution testing                                 | |
+| **MMLU**            | Massive Multitask Language Understanding           | 57-subject **multiple-choice test** spanning STEM/humanities                          | |
+| **C-Eval**          | Chinese Evaluation                                 | **Chinese-language** benchmark                          | |
+| **Output Price**    | Output token price                                 | CNY per million output tokens                                                         | |
+| **Input Price**     | Input token price                                  | CNY per million input tokens                                                          | |
+
 ## Install
 
 ```bash
