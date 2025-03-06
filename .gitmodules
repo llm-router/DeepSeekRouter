@@ -1,4 +1,4 @@
+
 [submodule "opencompass"]
 	path = opencompass
 	url = git@github.com:bucket-xv/opencompass.git
-	branch = main
