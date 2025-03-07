@@ -20,6 +20,25 @@ Currently, it supports DeepSeek R1 and the following providers:
 - [China Mobile Cloud](https://ecloud.10086.cn/portal)
 - [State Cloud](https://www.ctyun.cn/act/xirang/deepseek)
 
+The following table explains the metrics that this tool can evaluate:
+
+| **Abbreviation**         | **Full Form**                                      | **Description**                                                                       | **Supported Statistics**   | **Reference**|
+|---------------------|----------------------------------------------------|---------------------------------------------------------------------------------------|----------------------------|----------------------------|
+| **ttft**            | Time to first token                                | Latency between input submission and generation of the first output token             | average, median, p90, p99  |
+| **prefill**         | Prefill tokens per second                          | # of input tokens / ttft                                                              | average, median, p90, p99  |
+| **decode**          | Decode tokens per second                           | # of output tokens / (total time - ttft)                                              | average, median, p90, p99  |
+| **OTPS**            | Output tokens per second                           | # of output tokens / total time                                                       | average, median, p90, p99  |
+| **OTPR**            | Output tokens per request                          | Total output tokens (including reasoning tokens) generated to answer one user request | average, median, p90, p99  |
+| **Success Rate**    | Request success rate                               | Percentage of requests completed without errors/timeouts (regardless of correctness)  | |
+| [**GPQA-diamond**](https://github.com/idavidrein/gpqa)           | Subset of Graduate-Level Google-Proof Q&A                    | Benchmark testing **expert-level knowledge** across STEM/humanities                   | |
+| [**AIME2024**](https://artofproblemsolving.com/wiki/index.php/2024_AIME_I?srsltid=AfmBOoqGg01uE0oKFIeZ8GqperV-fbdCygQgT5_j1yFah7MOzl6C03Ll)       | American Invitational Mathematics Examination 2024 | **Math problem-solving** benchmark based on real competition questions                | |
+| [**LiveCodeBench**](https://github.com/LiveCodeBench/LiveCodeBench)   | Live Coding Benchmark                              | Real-time **code generation** evaluation with execution testing                       | |
+| [**MMLU**](https://github.com/hendrycks/test)         | Massive Multitask Language Understanding           | 57-subject **multiple-choice test** spanning STEM/humanities                          | |
+| [**C-Eval**](https://github.com/hkust-nlp/ceval) | Chinese Evaluation                                 | **Chinese-language** benchmark for STEM/humanities knowledge                          | |
+| **Output Price**    | Output token price                                 | CNY per million output tokens                                                         | |
+| **Input Price**     | Input token price                                  | CNY per million input tokens                                                          | |
+
+
 ## Install
 
 ```bash

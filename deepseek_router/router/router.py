@@ -33,7 +33,7 @@ Example input:
   ]
 }
 
-Supported metrics: ttft, prefill, decode, otps, otpr, success, gpqa, aime2024, output_price, input_price
+Supported metrics: ttft, prefill, decode, otps, otpr, success, gpqa, aime2024, livecodebench, mmlu, ceval, output_price, input_price
 Supported stats: avg, median, p90, p99
 """
 
