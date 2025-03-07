@@ -38,6 +38,21 @@ The following table explains the metrics that this tool can evaluate:
 | **Output Price**    | Output token price                                 | CNY per million output tokens                                                         | |
 | **Input Price**     | Input token price                                  | CNY per million input tokens                                                          | |
 
+| **Abbreviation**  | **Full Form**                                      | **Description**                                                                       | **Supported Statistics**   | 
+|-------------------|----------------------------------------------------|---------------------------------------------------------------------------------------|----------------------------|
+| **ttft**          | Time to first token                                | Latency between input submission and generation of the first output token             | average, median, p90, p99  |
+| **prefill**       | Prefill tokens per second                          | # of input tokens / ttft                                                              | average, median, p90, p99  |
+| **decode**        | Decode tokens per second                           | # of output tokens / (total time - ttft)                                              | average, median, p90, p99  |
+| **otps**          | Output tokens per second                           | # of output tokens / total time                                                       | average, median, p90, p99  |
+| **otpr**          | Output tokens per request                          | Total output tokens (including reasoning tokens) generated to answer one user request | average, median, p90, p99  |
+| **success**       | Request success rate                               | Percentage of requests completed without errors/timeouts (regardless of correctness)  | |
+| [**gpqa**](https://github.com/idavidrein/gpqa)          | Graduate-Level Google-Proof Q&A                    | Benchmark testing **expert-level knowledge** across STEM/humanities                   | |
+| [**aime2024**](https://artofproblemsolving.com/wiki/index.php/2024_AIME_I?srsltid=AfmBOoqGg01uE0oKFIeZ8GqperV-fbdCygQgT5_j1yFah7MOzl6C03Ll)      | American Invitational Mathematics Examination 2024 | **Math problem-solving** benchmark based on real competition questions                | |
+| [**livecodebench**](https://github.com/LiveCodeBench/LiveCodeBench) | Live Coding Benchmark                              | **Code generation** evaluation with execution testing                                 | |
+| [**mmlu**](https://github.com/hendrycks/test)          | Massive Multitask Language Understanding           | 57-subject **multiple-choice test** spanning STEM/humanities                          | |
+| [**ceval**](https://github.com/hkust-nlp/ceval)         | Chinese Evaluation                                 | **Chinese-language** benchmark                          | |
+| **output_price** | Output token price                                 | CNY per million output tokens                                                         | |
+| **input_price**   | Input token price                                  | CNY per million input tokens                                                          | |
 
 ## Install
 
